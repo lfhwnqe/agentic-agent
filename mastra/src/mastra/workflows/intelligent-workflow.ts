@@ -1,121 +1,86 @@
-import { createWorkflow } from '@mastra/core/workflows';
+import { createWorkflow, createStep } from '@mastra/core/workflows';
 import {
   userInputSchema,
+  workflowStateSchema,
   finalOutputSchema
 } from './types';
 import {
   intentAnalysisStep,
   contentGenerationStep,
   qualityEvaluationStep,
-  retryContentGenerationStep,
   finalizeResultStep
 } from './steps';
 
-
-
-
-
-
-
-
-
-
-
 /**
- * 智能三代理协作工作流
+ * 智能三代理协作工作流 - 重构版本
  *
+ * 使用 Mastra 的 dountil 循环工作流替代复杂的分支逻辑
+ * 
  * 工作流架构：
- * 1. 意图分析 - 分析用户输入并优化提示词
- * 2. 内容生成 - 基于优化提示词生成内容
- * 3. 质量评估 - 评估生成内容质量
- * 4. 条件分支 - 根据质量评估结果决定是否重试或输出结果
- * 5. 重试机制 - 支持最大重试次数限制的智能重试
+ * 1. 意图分析 - 分析用户输入并优化提示词（一次性执行）
+ * 2. 循环执行：内容生成 → 质量评估，直到质量达标或达到最大重试次数
+ * 3. 最终化结果 - 输出最终结果
  *
- * 此文件只负责工作流的步骤编排和条件控制，
- * 具体的业务逻辑实现在各个步骤模块中。
+ * 此重构版本简化了步骤数量，利用循环工作流的优势减少重复代码，
+ * 更符合 Mastra 框架的设计理念和最佳实践。
  */
+
+// 重试计数步骤 - 用于在循环中增加重试次数
+const incrementRetryStep = createStep({
+  id: 'increment-retry',
+  description: '增加重试计数',
+  inputSchema: workflowStateSchema,
+  outputSchema: workflowStateSchema,
+  execute: async ({ inputData }) => {
+    return {
+      ...inputData,
+      currentRetry: inputData.currentRetry + 1,
+    };
+  },
+});
+
+// 创建内容生成和质量评估的嵌套工作流
+const contentQualityLoopWorkflow = createWorkflow({
+  id: 'content-quality-loop',
+  description: '内容生成和质量评估循环工作流',
+  inputSchema: workflowStateSchema,
+  outputSchema: workflowStateSchema,
+  steps: [contentGenerationStep, qualityEvaluationStep, incrementRetryStep],
+})
+  .then(contentGenerationStep)
+  .then(qualityEvaluationStep)
+  .then(incrementRetryStep)
+  .commit();
+
+// 主工作流 - 使用 dountil 循环
 const intelligentWorkflow = createWorkflow({
   id: 'intelligent-workflow',
-  description: '智能三agent协作workflow，支持条件分支和回流控制',
+  description: '智能三agent协作workflow，使用循环工作流优化重试逻辑',
   inputSchema: userInputSchema,
   outputSchema: finalOutputSchema,
   steps: [
     intentAnalysisStep,
-    contentGenerationStep,
-    qualityEvaluationStep,
-    retryContentGenerationStep,
+    contentQualityLoopWorkflow,
     finalizeResultStep,
   ],
 })
-  // 工作流执行序列：意图分析 → 内容生成 → 质量评估
+  // 第一步：执行意图分析
   .then(intentAnalysisStep)
-  .then(contentGenerationStep)
-  .then(qualityEvaluationStep)
-  // 条件分支：根据质量评估结果决定下一步
-  .branch([
-    // 分支1：质量达标，直接输出结果
-    [
-      async ({ inputData }: any) => {
-        return inputData.qualityEvaluation?.overallQuality === 'PASS';
-      },
-      finalizeResultStep as any,
-    ],
-    // 分支2：质量不达标且未达到最大重试次数，进行重试
-    [
-      async ({ inputData }: any) => {
-        return (
-          inputData.qualityEvaluation?.overallQuality === 'FAIL' &&
-          inputData.currentRetry < inputData.maxRetries
-        );
-      },
-      retryContentGenerationStep as any,
-    ],
-    // 分支3：质量不达标且已达到最大重试次数，输出失败结果
-    [
-      async ({ inputData }: any) => {
-        return (
-          inputData.qualityEvaluation?.overallQuality === 'FAIL' &&
-          inputData.currentRetry >= inputData.maxRetries
-        );
-      },
-      finalizeResultStep as any,
-    ],
-  ])
-  // 重试后再次进行条件判断
-  .branch([
-    // 重试后质量达标
-    [
-      async ({ inputData }: any) => {
-        return (
-          inputData.qualityEvaluation?.overallQuality === 'PASS' &&
-          inputData.currentRetry > 0
-        );
-      },
-      finalizeResultStep as any,
-    ],
-    // 重试后仍不达标但未达到最大重试次数，继续重试
-    [
-      async ({ inputData }: any) => {
-        return (
-          inputData.qualityEvaluation?.overallQuality === 'FAIL' &&
-          inputData.currentRetry < inputData.maxRetries
-        );
-      },
-      retryContentGenerationStep as any,
-    ],
-    // 重试后仍不达标且已达到最大重试次数
-    [
-      async ({ inputData }: any) => {
-        return (
-          inputData.qualityEvaluation?.overallQuality === 'FAIL' &&
-          inputData.currentRetry >= inputData.maxRetries
-        );
-      },
-      finalizeResultStep as any,
-    ],
-  ]);
+  // 第二步：使用 dountil 循环执行内容生成和质量评估
+  .dountil(
+    // 嵌套工作流：内容生成 → 质量评估 → 增加重试次数
+    contentQualityLoopWorkflow,
+    // 停止条件：质量达标 OR 达到最大重试次数
+    async ({ inputData }) => {
+      const qualityPass = inputData.qualityEvaluation?.overallQuality === 'PASS';
+      const maxRetriesReached = inputData.currentRetry >= inputData.maxRetries;
+      return qualityPass || maxRetriesReached;
+    }
+  )
+  // 第三步：最终化结果
+  .then(finalizeResultStep);
 
-// 提交workflow
+// 提交工作流
 intelligentWorkflow.commit();
 
 // 导出重构后的工作流
@@ -137,6 +102,5 @@ export {
   contentGenerationStep,
   qualityEvaluationStep,
   incrementRetryStep,
-  finalizeResultStep,
-  retryContentGenerationStep
+  finalizeResultStep
 } from './steps';
