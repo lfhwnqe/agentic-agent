@@ -101,6 +101,8 @@ export {
   intentAnalysisStep,
   contentGenerationStep,
   qualityEvaluationStep,
-  incrementRetryStep,
   finalizeResultStep
 } from './steps';
+
+// 导出内联定义的步骤
+export { incrementRetryStep };
