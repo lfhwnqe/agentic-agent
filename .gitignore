@@ -3,6 +3,7 @@
 */node_modules/
 */.mastra/
 */.output/
+mastra.db
 .vscode/
 .env
 .env.development
