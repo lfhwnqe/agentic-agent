@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { mastra } from './mastra/src/mastra/index.js';
+import { mastra } from '@/mastra/src/mastra';
 
 export interface IntelligentWorkflowInput {
   userInput: string;
