@@ -26,3 +26,4 @@ mastra.db
 .env.local.example
 node_modules/
 node_modules
+dist/
