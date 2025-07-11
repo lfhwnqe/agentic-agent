@@ -23,38 +23,100 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+这是一个集成了 [Mastra](https://mastra.ai) AI 代理框架的 [NestJS](https://github.com/nestjs/nest) 应用程序。
+
+### 项目特性
+
+- **NestJS 框架**: 用于构建高效、可扩展的服务器端应用程序
+- **Mastra AI 代理**: 集成了多个智能代理用于交易分析和内容生成
+- **Google Gemini LLM**: 使用 Google Gemini 作为主要的大语言模型
+- **向量存储**: 本地文件系统向量存储用于知识库管理
+- **工作流系统**: 基于 Mastra 的工作流编排系统
+
+### Mastra 代理系统
+
+项目包含以下 AI 代理：
+- **意图分析代理**: 分析用户意图并优化提示
+- **内容生成代理**: 基于分析结果生成内容
+- **质量评估代理**: 评估生成内容的质量
+- **交易分析代理**: 专门用于交易数据分析
+- **交易策略代理**: 生成交易策略建议
+- **交易评估代理**: 评估交易决策
 
 ## Project setup
 
 ```bash
-$ yarn install
+$ npm install
+```
+
+### 环境配置
+
+在运行项目之前，请确保配置以下环境变量：
+
+```bash
+# Google Gemini API 密钥
+GOOGLE_API_KEY=your_google_api_key_here
+
+# 其他 Mastra 相关配置
+MASTRA_LOG_LEVEL=info
 ```
 
 ## Compile and run the project
 
 ```bash
 # development
-$ yarn run start
+$ npm run start
 
 # watch mode
-$ yarn run start:dev
+$ npm run start:dev
 
 # production mode
-$ yarn run start:prod
+$ npm run start:prod
 ```
 
 ## Run tests
 
 ```bash
 # unit tests
-$ yarn run test
+$ npm run test
 
 # e2e tests
-$ yarn run test:e2e
+$ npm run test:e2e
 
 # test coverage
-$ yarn run test:cov
+$ npm run test:cov
+
+# 测试 Mastra 智能工作流
+$ npm run test:mastra
+
+# 测试 Mastra 交易工作流
+$ npm run test:trade
+```
+
+## API 端点
+
+应用程序提供以下 Mastra 相关的 API 端点：
+
+### GET /mastra/agents
+获取所有可用的 AI 代理列表
+
+### GET /mastra/workflows
+获取所有可用的工作流列表
+
+### POST /mastra/intelligent-workflow
+运行智能工作流
+```json
+{
+  "input": "your_input_data"
+}
+```
+
+### POST /mastra/trade-workflow
+运行交易工作流
+```json
+{
+  "input": "your_trade_data"
+}
 ```
 
 ## Deployment
@@ -64,7 +126,7 @@ When you're ready to deploy your NestJS application to production, there are som
 If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
 
 ```bash
-$ yarn install -g @nestjs/mau
+$ npm install -g @nestjs/mau
 $ mau deploy
 ```
 
