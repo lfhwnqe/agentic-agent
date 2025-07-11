@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { mastra } from '@/mastra/src/mastra';
+import { mastra } from '../mastra/../../../mastra/src/mastra/index';
 
 export interface IntelligentWorkflowInput {
   userInput: string;
@@ -29,13 +29,13 @@ export class MastraService {
         },
       });
 
-      this.logger.log(`Intelligent workflow completed for input: ${input.userInput}`);
+      this.logger.log(
+        `Intelligent workflow completed for input: ${input.userInput}`,
+      );
       return result;
     } catch (error) {
       this.logger.error('Failed to run intelligent workflow', error);
       throw error;
     }
   }
-
-
 }

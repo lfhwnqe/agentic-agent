@@ -1,4 +1,11 @@
-import { Controller, Post, Get, Body, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { MastraService, IntelligentWorkflowInput } from './mastra.service';
 
 @Controller('mastra')
@@ -27,8 +34,6 @@ export class MastraController {
       );
     }
   }
-
-
 
   /**
    * 健康检查
