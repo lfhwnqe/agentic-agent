@@ -37,6 +37,11 @@ export class RetryStepLogic {
     // 获取之前的改进建议
     const improvementSuggestions = inputData.qualityEvaluation?.improvementSuggestions || [];
 
+    // 检查必要的数据是否存在
+    if (!updatedData.intentAnalysis) {
+      throw new Error('Intent analysis data is missing for retry');
+    }
+
     // 重新生成内容
     const contentGeneration = await ContentGenerationStepLogic.execute(
       updatedData.intentAnalysis,

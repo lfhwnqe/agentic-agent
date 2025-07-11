@@ -27,3 +27,4 @@ mastra.db
 node_modules/
 node_modules
 dist/
+.mastra
