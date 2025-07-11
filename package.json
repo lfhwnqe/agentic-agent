@@ -18,9 +18,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "dev": "cd src/mastra && mastra dev",
-    "mastra:build": "cd src/mastra && mastra build",
-    "mastra:start": "cd src/mastra && mastra start"
+    "dev": "cd mastra && mastra dev",
+    "mastra:dev": "cd mastra && mastra dev",
+    "mastra:build": "cd mastra && mastra build",
+    "mastra:start": "cd mastra && mastra start"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.2.22",
