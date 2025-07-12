@@ -7,11 +7,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // 启用全局验证管道
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 
   // 配置Swagger
   const config = new DocumentBuilder()
@@ -33,6 +35,8 @@ async function bootstrap() {
   await app.listen(port);
 
   console.log(`Application is running on: http://localhost:${port}`);
-  console.log(`Swagger documentation is available at: http://localhost:${port}/api`);
+  console.log(
+    `Swagger documentation is available at: http://localhost:${port}/api`,
+  );
 }
 bootstrap();

@@ -25,7 +25,8 @@ export class MastraController {
   @Post('workflows/intelligent')
   @ApiOperation({
     summary: '执行智能工作流',
-    description: '使用三代理协作系统（意图分析、内容生成、质量评估）处理用户输入',
+    description:
+      '使用三代理协作系统（意图分析、内容生成、质量评估）处理用户输入',
   })
   @ApiBody({ type: IntelligentWorkflowInputDto })
   @ApiResponse({

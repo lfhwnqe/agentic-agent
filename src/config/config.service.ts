@@ -12,7 +12,9 @@ export class AppConfigService {
   get googleApiKey(): string {
     const apiKey = this.configService.get<string>('google.apiKey');
     if (!apiKey) {
-      throw new Error('GOOGLE_GENERATIVE_AI_API_KEY is required but not provided');
+      throw new Error(
+        'GOOGLE_GENERATIVE_AI_API_KEY is required but not provided',
+      );
     }
     return apiKey;
   }
@@ -34,7 +36,8 @@ export class AppConfigService {
     try {
       this.googleApiKey; // 这会触发验证
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Configuration validation failed: ${errorMessage}`);
     }
   }

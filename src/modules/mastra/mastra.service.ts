@@ -19,7 +19,8 @@ export class MastraService implements OnModuleInit {
       this.configService.validateConfig();
 
       // 设置环境变量以确保Mastra能够访问
-      process.env.GOOGLE_GENERATIVE_AI_API_KEY = this.configService.googleApiKey;
+      process.env.GOOGLE_GENERATIVE_AI_API_KEY =
+        this.configService.googleApiKey;
 
       // 动态导入Mastra实例
       const { mastra } = await import('../../../mastra/src/mastra/index');
