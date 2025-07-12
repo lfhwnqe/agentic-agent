@@ -47,7 +47,9 @@ export class MastraService implements OnModuleInit {
     }
 
     const startTime = Date.now();
-    this.logger.log(`Starting intelligent workflow for input: "${input.userInput}"`);
+    this.logger.log(
+      `Starting intelligent workflow for input: "${input.userInput}"`,
+    );
 
     try {
       const workflow = this.mastra.getWorkflow('intelligentWorkflow');
@@ -86,7 +88,9 @@ export class MastraService implements OnModuleInit {
 
     const startTime = Date.now();
     this.logger.log(`Starting trade workflow for input: "${input.userInput}"`);
-    this.logger.log(`Trade workflow parameters: maxRetries=${input.maxRetries || this.configService.workflowMaxRetries}`);
+    this.logger.log(
+      `Trade workflow parameters: maxRetries=${input.maxRetries || this.configService.workflowMaxRetries}`,
+    );
 
     try {
       // 获取交易工作流
@@ -100,7 +104,9 @@ export class MastraService implements OnModuleInit {
       this.logger.log('Trade workflow run instance created');
 
       // 记录开始执行
-      this.logger.log('Executing trade workflow steps: Analysis → Strategy Generation → Evaluation → Finalization');
+      this.logger.log(
+        'Executing trade workflow steps: Analysis → Strategy Generation → Evaluation → Finalization',
+      );
 
       // 执行工作流
       const result = await run.start({
